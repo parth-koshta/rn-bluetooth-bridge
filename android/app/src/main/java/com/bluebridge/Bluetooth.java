@@ -122,7 +122,7 @@ public class Bluetooth extends ReactContextBaseJavaModule {
         Activity currentActivity = getCurrentActivity();
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-
+        System.out.println(mBluetoothAdapter);
         if (mBluetoothAdapter == null) {
             bluetoothSupported = false;
             System.out.println("no bluetooth capability...");
@@ -142,6 +142,7 @@ public class Bluetooth extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void startCreateThread(final String id){
+        cancel = false;
         System.out.println("printing id");
         System.out.println(id);
         createThread(id);
@@ -262,7 +263,6 @@ public class Bluetooth extends ReactContextBaseJavaModule {
                     while (true) {
                         try {
                             // Read from the InputStream
-//                            System.out.println("printing mmInStream");
 //                            System.out.println(mmInStream);
                             bytes = mmInStream.available();
 //                            System.out.println(bytes);
@@ -275,8 +275,24 @@ public class Bluetooth extends ReactContextBaseJavaModule {
                                   bytes = mmInStream.read(buffer);
                                   String readMessage = new String(buffer, 0, bytes);
 //                                   System.out.println("reading buffer----------------------");
-                                   System.out.println(readMessage);
-                                receivedData = readMessage;
+                                if(cancel == true){
+                                    System.out.println("inside cancel");
+                                    mmInStream.close();
+                                    mmOutStream.close();
+                                    mConnectedThread.cancel();
+                                    mBTSocket.close();
+                                    mConnectedThread.interrupt();
+                                    System.out.println(mBTSocket.isConnected());
+                                    System.out.println(mmSocket.isConnected());
+                                    System.out.println(mConnectedThread.getState());
+                                    receivedData = "";
+
+                                }
+                                if(cancel == false){
+                                    System.out.println(readMessage);
+                                    receivedData = readMessage;
+                                }
+
 
 
 
@@ -342,7 +358,7 @@ public class Bluetooth extends ReactContextBaseJavaModule {
         IntentFilter filter1 = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         //System.out.println(preceiver);
         System.out.println(filter1);
-       // currentActivity.registerReceiver(preceiver, filter1);
+        currentActivity.registerReceiver(preceiver, filter1);
         mBluetoothAdapter.startDiscovery();
 
 

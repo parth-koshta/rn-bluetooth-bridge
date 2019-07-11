@@ -14,6 +14,8 @@ class BluetoothScreen extends Component {
       selectedDeviceId: null
     };
   }
+
+  interval = null;
   startBluetooth() {
     // NativeModules.Bluetooth.startBluetooth().then(item=>{
     //     console.log(item);
@@ -68,18 +70,22 @@ setInterval(() => {
         console.log('====================================');
         console.log(item);
     })
+    console.log(this.interval)
 }, 100);
 
-// this.listener = DeviceEventEmitter.addListener('myAwesomeEvent', e => console.log(e));
 
   }
-
+disconnectSocket = () => {
+    
+    NativeModules.Bluetooth.disconnectSocket();
+    clearInterval(this.interval);
+}
 
   componentDidMount() {
     this.checkBluetoothSupport();
     this.startBluetooth();
     // this.getPairedDevices();
-    // this.scan();
+    this.scan();
   }
 
   componentWillUnmount(){
